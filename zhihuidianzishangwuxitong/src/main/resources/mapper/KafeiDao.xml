@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KafeiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shangjia_id as shangjiaId
+        ,a.kafei_name as kafeiName
+        ,a.kafei_photo as kafeiPhoto
+        ,a.kafei_types as kafeiTypes
+        ,a.kafei_kucun_number as kafeiKucunNumber
+        ,a.kafei_old_money as kafeiOldMoney
+        ,a.kafei_new_money as kafeiNewMoney
+        ,a.kafei_clicknum as kafeiClicknum
+        ,a.shangxia_types as shangxiaTypes
+        ,a.kafei_delete as kafeiDelete
+        ,a.kafei_content as kafeiContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KafeiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,shangjia.shangjia_name as shangjiaName
+        ,shangjia.shangjia_phone as shangjiaPhone
+        ,shangjia.shangjia_email as shangjiaEmail
+        ,shangjia.shangjia_photo as shangjiaPhoto
+        ,shangjia.shangjia_xingji_types as shangjiaXingjiTypes
+        ,shangjia.new_money as newMoney
+        ,shangjia.shangjia_content as shangjiaContent
+        ,shangjia.shangjia_delete as shangjiaDelete
+
+        FROM kafei  a
+        left JOIN shangjia shangjia ON a.shangjia_id = shangjia.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.shangjiaId != null and params.shangjiaId != ''">
+                and (
+                    a.shangjia_id = #{params.shangjiaId}
+                )
+            </if>
+            <if test=" params.kafeiName != '' and params.kafeiName != null and params.kafeiName != 'null' ">
+                and a.kafei_name like CONCAT('%',#{params.kafeiName},'%')
+            </if>
+            <if test="params.kafeiTypes != null and params.kafeiTypes != ''">
+                and a.kafei_types = #{params.kafeiTypes}
+            </if>
+            <if test="params.kafeiKucunNumberStart != null and params.kafeiKucunNumberStart != ''">
+                <![CDATA[  and a.kafei_kucun_number >= #{params.kafeiKucunNumberStart}   ]]>
+            </if>
+            <if test="params.kafeiKucunNumberEnd != null and params.kafeiKucunNumberEnd != ''">
+                <![CDATA[  and a.kafei_kucun_number <= #{params.kafeiKucunNumberEnd}   ]]>
+            </if>
+             <if test="params.kafeiKucunNumber != null and params.kafeiKucunNumber != ''">
+                and a.kafei_kucun_number = #{params.kafeiKucunNumber}
+             </if>
+            <if test="params.kafeiOldMoneyStart != null ">
+                <![CDATA[  and a.kafei_old_money >= #{params.kafeiOldMoneyStart}   ]]>
+            </if>
+            <if test="params.kafeiOldMoneyEnd != null ">
+                <![CDATA[  and a.kafei_old_money <= #{params.kafeiOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.kafeiNewMoneyStart != null ">
+                <![CDATA[  and a.kafei_new_money >= #{params.kafeiNewMoneyStart}   ]]>
+            </if>
+            <if test="params.kafeiNewMoneyEnd != null ">
+                <![CDATA[  and a.kafei_new_money <= #{params.kafeiNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.kafeiClicknumStart != null and params.kafeiClicknumStart != ''">
+                <![CDATA[  and a.kafei_clicknum >= #{params.kafeiClicknumStart}   ]]>
+            </if>
+            <if test="params.kafeiClicknumEnd != null and params.kafeiClicknumEnd != ''">
+                <![CDATA[  and a.kafei_clicknum <= #{params.kafeiClicknumEnd}   ]]>
+            </if>
+             <if test="params.kafeiClicknum != null and params.kafeiClicknum != ''">
+                and a.kafei_clicknum = #{params.kafeiClicknum}
+             </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.kafeiDeleteStart != null and params.kafeiDeleteStart != ''">
+                <![CDATA[  and a.kafei_delete >= #{params.kafeiDeleteStart}   ]]>
+            </if>
+            <if test="params.kafeiDeleteEnd != null and params.kafeiDeleteEnd != ''">
+                <![CDATA[  and a.kafei_delete <= #{params.kafeiDeleteEnd}   ]]>
+            </if>
+             <if test="params.kafeiDelete != null and params.kafeiDelete != ''">
+                and a.kafei_delete = #{params.kafeiDelete}
+             </if>
+            <if test=" params.kafeiContent != '' and params.kafeiContent != null and params.kafeiContent != 'null' ">
+                and a.kafei_content like CONCAT('%',#{params.kafeiContent},'%')
+            </if>
+
+                <!-- 判断商家的id不为空 -->
+            <if test=" params.shangjiaIdNotNull != '' and params.shangjiaIdNotNull != null and params.shangjiaIdNotNull != 'null' ">
+                and a.shangjia_id IS NOT NULL
+            </if>
+            <if test=" params.shangjiaName != '' and params.shangjiaName != null and params.shangjiaName != 'null' ">
+                and shangjia.shangjia_name like CONCAT('%',#{params.shangjiaName},'%')
+            </if>
+            <if test=" params.shangjiaPhone != '' and params.shangjiaPhone != null and params.shangjiaPhone != 'null' ">
+                and shangjia.shangjia_phone like CONCAT('%',#{params.shangjiaPhone},'%')
+            </if>
+            <if test=" params.shangjiaEmail != '' and params.shangjiaEmail != null and params.shangjiaEmail != 'null' ">
+                and shangjia.shangjia_email like CONCAT('%',#{params.shangjiaEmail},'%')
+            </if>
+            <if test="params.shangjiaXingjiTypes != null  and params.shangjiaXingjiTypes != ''">
+                and shangjia.shangjia_xingji_types = #{params.shangjiaXingjiTypes}
+            </if>
+
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and shangjia.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and shangjia.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test=" params.shangjiaContent != '' and params.shangjiaContent != null and params.shangjiaContent != 'null' ">
+                and shangjia.shangjia_content like CONCAT('%',#{params.shangjiaContent},'%')
+            </if>
+            <if test="params.shangjiaDeleteStart != null  and params.shangjiaDeleteStart != '' ">
+                <![CDATA[  and shangjia.shangjia_delete >= #{params.shangjiaDeleteStart}   ]]>
+            </if>
+            <if test="params.shangjiaDeleteEnd != null  and params.shangjiaDeleteEnd != '' ">
+                <![CDATA[  and shangjia.shangjia_delete <= #{params.shangjiaDeleteEnd}   ]]>
+            </if>
+            <if test="params.shangjiaDelete != null  and params.shangjiaDelete != '' ">
+                and shangjia.shangjia_delete = #{params.shangjiaDelete}
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
